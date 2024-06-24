@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="dev" translate="label">
+            <group id="slack_notifier" translate="label" type="text" sortOrder="10" showInStore="1">
+                <label>Slack Notifier</label>
+                <field id="enable" translate="label comment" type="select" sortOrder="5" showInStore="1">
+                    <label>Activate</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Activate or deactivate the Slack notifier module.</comment>
+                </field>
+                <field id="is_async" translate="label comment" type="select" sortOrder="6" showInStore="1">
+                    <label>Use Async Send</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Select send mode: async or sync.</comment>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </field>
+                <field id="timeout" translate="label comment" type="text" sortOrder="7" showInStore="1">
+                    <label>API Timeout</label>
+                    <comment>The Time in Seconds before the API Call times out. Use 0 to wait indefinitely.</comment>
+                    <validate>number</validate>
+                    <depends>
+                        <field id="is_async">0</field>
+                        <field id="enable">1</field>
+                    </depends>
+                </field>
+                <field id="logger_type" translate="label comment" type="multiselect" sortOrder="8" showInStore="1">
+                    <label>Logger Type</label>
+                    <source_model>Magify\SlackNotifier\Model\Config\Source\LoggerType</source_model>
+                    <comment>Select logger types to send.</comment>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </field>
+                <field id="url" translate="label comment" type="text" sortOrder="9" showInDefault="1" showInStore="1">
+                    <label>Url</label>
+                    <validate>required-entry</validate>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </field>
+                <field id="channel_id" translate="label comment" type="text" sortOrder="10" showInStore="1">
+                    <label>Channel ID</label>
+                    <comment>Set Slack channel ID.</comment>
+                    <validate>required-entry</validate>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </field>
+                <field id="token" translate="label comment" type="text" sortOrder="11" showInStore="1">
+                    <label>Token</label>
+                    <comment>Set Slack app token.</comment>
+                    <validate>required-entry</validate>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

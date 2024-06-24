@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <dev>
+            <slack_notifier>
+                <enable>0</enable>
+                <url>https://slack.com/api/chat.postMessage</url>
+                <is_async>1</is_async>
+                <timeout>0</timeout>
+            </slack_notifier>
+        </dev>
+    </default>
+</config>
