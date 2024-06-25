@@ -29,7 +29,6 @@ class Message
      * @param Http $requestHttp
      */
     public function __construct(
-        LoggerInterfaceFactory $loggerFactory,
         Config $config,
         ClientFactory $clientFactory,
         CustomerSession $customerSession,
@@ -37,7 +36,6 @@ class Message
         Http $requestHttp
     )
     {
-        $this->loggerFactory = $loggerFactory;
         $this->config = $config;
         $this->clientFactory = $clientFactory;
         $this->customerSession = $customerSession;
@@ -84,16 +82,16 @@ class Message
 
                 $responseContent = json_decode($response->getBody()->getContents(), true);
 
-                if ($response->getStatusCode() !== 200 || (is_array($responseContent) && isset($responseContent['error']))) {
-                    $logger->critical(
-                        $responseContent['error'],
-                        ['details' => json_encode($responseContent),
-                        'source' => 'slack_notify']
-                    );
-                }
+//                if ($response->getStatusCode() !== 200 || (is_array($responseContent) && isset($responseContent['error']))) {
+//                    $logger->critical(
+//                        $responseContent['error'],
+//                        ['details' => json_encode($responseContent),
+//                        'source' => 'slack_notify']
+//                    );
+//                }
 
             } catch (Exception|ClientException $e) {
-                $logger->critical($e->getMessage(), ['source' => 'slack_notify']);
+//                $logger->critical($e->getMessage(), ['source' => 'slack_notify']);
             }
         } else {
             $logger->critical(
