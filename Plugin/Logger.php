@@ -3,35 +3,34 @@
 namespace Magify\SlackNotifier\Plugin;
 
 use Magento\Framework\DataObject;
-use Magify\SlackNotifier\Helper\Message as MessageHelper;
 use Monolog\Logger as MonologLogger;
 use Magify\SlackNotifier\Helper\Config as ConfigHelper;
+use Magify\SlackNotifier\Service\Test;
 use Magento\Framework\MessageQueue\PublisherInterface;
 
 class Logger
 {
     private $configHelper;
     private $publisher;
-    private $messageHelper;
     private $dataObject;
+    private $test;
 
     /**
      * @param ConfigHelper $configHelper
      * @param PublisherInterface $publisher
-     * @param MessageHelper $messageHelper
      * @param DataObject $dataObject
      */
     public function __construct(
         ConfigHelper $configHelper,
         PublisherInterface $publisher,
-        MessageHelper $messageHelper,
-        DataObject $dataObject
+        DataObject $dataObject,
+        Test $test
     )
     {
         $this->configHelper = $configHelper;
         $this->publisher = $publisher;
-        $this->messageHelper = $messageHelper;
         $this->dataObject = $dataObject;
+        $this->test = $test;
     }
 
     public function beforeAddRecord(
@@ -60,7 +59,7 @@ class Logger
                     'context' => $context
                 ]
             );
-            $block = $this->messageHelper->buildMessage($messageInfo);
+            $block = $this->test->getbuildmessage($messageInfo);
             if ($this->configHelper->isSendAsync()) {
                 $data = [
                     'level' => $subject::getLevelName($level),
@@ -72,7 +71,7 @@ class Logger
                     json_encode($data)
                 );
             } else {
-                $this->messageHelper->sendMessage($subject::getLevelName($level), $block);
+                $this->test->getmessage($subject::getLevelName($level), $block);
             }
 
         }
