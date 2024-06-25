@@ -2,7 +2,7 @@
 
 namespace Magify\SlackNotifier\Model;
 
-use Magify\SlackNotifier\Helper\Message as MessageHelper;
+//use Magify\SlackNotifier\Helper\Message as MessageHelper;
 
 /**
  * Class Consumer used to process OperationInterface messages.
@@ -11,12 +11,10 @@ class Consumer
 {
     private $messageHelper;
 
-    /**
-     * @param MessageHelper $messageHelper
-     */
-   public function __construct(MessageHelper $messageHelper)
+   
+   public function __construct(/*MessageHelper $messageHelper*/)
    {
-       $this->messageHelper = $messageHelper;
+       //$this->messageHelper = $messageHelper;
    }
 
     /**
@@ -27,6 +25,6 @@ class Consumer
     public function process($request)
     {
         $data = json_decode($request, true);
-        $this->messageHelper->sendMessage($data['level'], $data['block']);
+       // $this->messageHelper->sendMessage($data['level'], $data['block']);
     }
 }
