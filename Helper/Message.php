@@ -9,11 +9,11 @@ use GuzzleHttp\Exception\ClientException;
 use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\App\State;
-use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerInterfaceFactory;
 
 class Message
 {
-    private $logger;
+    private $loggerFactory;
     private $config;
     private $clientFactory;
     private $customerSession;
@@ -21,7 +21,7 @@ class Message
     private $requestHttp;
 
     /**
-     * @param LoggerInterface $logger
+     * @param LoggerInterfaceFactory $loggerFactory
      * @param Config $config
      * @param ClientFactory $clientFactory
      * @param CustomerSession $customerSession
@@ -29,7 +29,7 @@ class Message
      * @param Http $requestHttp
      */
     public function __construct(
-        LoggerInterface $logger,
+        LoggerInterfaceFactory $loggerFactory,
         Config $config,
         ClientFactory $clientFactory,
         CustomerSession $customerSession,
@@ -37,7 +37,7 @@ class Message
         Http $requestHttp
     )
     {
-        $this->logger = $logger;
+        $this->loggerFactory = $loggerFactory;
         $this->config = $config;
         $this->clientFactory = $clientFactory;
         $this->customerSession = $customerSession;
@@ -57,6 +57,7 @@ class Message
         $channelId = $this->config->getChannelId();
         $token = $this->config->getToken();
         $uri = $this->config->getApiUri();
+        $logger = $this->loggerFactory->create();
 
         if ($uri && $channelId && $token) {
 
@@ -84,14 +85,21 @@ class Message
                 $responseContent = json_decode($response->getBody()->getContents(), true);
 
                 if ($response->getStatusCode() !== 200 || (is_array($responseContent) && isset($responseContent['error']))) {
-                    $this->logger->critical($responseContent['error'], ['details' => json_encode($responseContent), 'source' => 'slack_notify']);
+                    $logger->critical(
+                        $responseContent['error'],
+                        ['details' => json_encode($responseContent),
+                        'source' => 'slack_notify']
+                    );
                 }
 
             } catch (Exception|ClientException $e) {
-                $this->logger->critical($e->getMessage(), ['source' => 'slack_notify']);
+                $logger->critical($e->getMessage(), ['source' => 'slack_notify']);
             }
         } else {
-            $this->logger->critical('One of the Slack credentials is incorrect. (Url or Channel ID or Token)', ['source' => 'slack_notify']);
+            $logger->critical(
+                'One of the Slack credentials is incorrect. (Url or Channel ID or Token)',
+                ['source' => 'slack_notify']
+            );
         }
 
     }
