@@ -29,14 +29,14 @@ class Message
      * @param Http $requestHttp
      */
     public function __construct(
-        Config $config,
+//        Config $config,
         ClientFactory $clientFactory,
         CustomerSession $customerSession,
         State $state,
         Http $requestHttp
     )
     {
-        $this->config = $config;
+//        $this->config = $config;
         $this->clientFactory = $clientFactory;
         $this->customerSession = $customerSession;
         $this->state = $state;
@@ -55,7 +55,7 @@ class Message
         $channelId = $this->config->getChannelId();
         $token = $this->config->getToken();
         $uri = $this->config->getApiUri();
-        $logger = $this->loggerFactory->create();
+//        $logger = $this->loggerFactory->create();
 
         if ($uri && $channelId && $token) {
 
@@ -94,10 +94,10 @@ class Message
 //                $logger->critical($e->getMessage(), ['source' => 'slack_notify']);
             }
         } else {
-            $logger->critical(
-                'One of the Slack credentials is incorrect. (Url or Channel ID or Token)',
-                ['source' => 'slack_notify']
-            );
+//            $logger->critical(
+//                'One of the Slack credentials is incorrect. (Url or Channel ID or Token)',
+//                ['source' => 'slack_notify']
+//            );
         }
 
     }

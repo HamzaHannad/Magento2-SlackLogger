@@ -11,7 +11,7 @@ class Consumer
 {
     private $messageHelper;
 
-   
+
    public function __construct(/*MessageHelper $messageHelper*/)
    {
        //$this->messageHelper = $messageHelper;
