@@ -21,13 +21,13 @@ class Logger
      * @param DataObject $dataObject
      */
     public function __construct(
-        ConfigHelper $configHelper,
+//        ConfigHelper $configHelper,
         PublisherInterface $publisher,
         DataObject $dataObject,
         Test $test
     )
     {
-        $this->configHelper = $configHelper;
+//        $this->configHelper = $configHelper;
         $this->publisher = $publisher;
         $this->dataObject = $dataObject;
         $this->test = $test;
@@ -45,8 +45,8 @@ class Logger
             return [$level, $message, $context];
         }
 
-        if ($this->configHelper->isSlackNotifierEnabled() && in_array($level, $this->configHelper->getLoggerTypes()))
-        {
+//        if ($this->configHelper->isSlackNotifierEnabled() && in_array($level, $this->configHelper->getLoggerTypes()))
+//        {
             $timezone = new \DateTimeZone(date_default_timezone_get() ?: 'UTC');
             $ts = new \DateTime('now', $timezone);
             $ts->setTimezone($timezone);
@@ -60,7 +60,7 @@ class Logger
                 ]
             );
             $block = $this->test->getbuildmessage($messageInfo);
-            if ($this->configHelper->isSendAsync()) {
+            if (false) {
                 $data = [
                     'level' => $subject::getLevelName($level),
                     'block' => $block
@@ -74,7 +74,7 @@ class Logger
                 $this->test->getmessage($subject::getLevelName($level), $block);
             }
 
-        }
+//        }
         return [$level, $message, $context];
     }
 
