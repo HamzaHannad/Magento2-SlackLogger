@@ -4,9 +4,9 @@ namespace Magify\SlackNotifier\Plugin;
 
 use Magento\Framework\DataObject;
 use Monolog\Logger as MonologLogger;
-use Magify\SlackNotifier\Helper\Config as ConfigHelper;
+//use Magify\SlackNotifier\Helper\Config as ConfigHelper;
 use Magify\SlackNotifier\Service\Test;
-use Magento\Framework\MessageQueue\PublisherInterface;
+//use Magento\Framework\MessageQueue\PublisherInterface;
 
 class Logger
 {
@@ -22,13 +22,13 @@ class Logger
      */
     public function __construct(
 //        ConfigHelper $configHelper,
-        PublisherInterface $publisher,
+//        PublisherInterface $publisher,
         DataObject $dataObject,
         Test $test
     )
     {
 //        $this->configHelper = $configHelper;
-        $this->publisher = $publisher;
+//        $this->publisher = $publisher;
         $this->dataObject = $dataObject;
         $this->test = $test;
     }
@@ -61,15 +61,15 @@ class Logger
             );
             $block = $this->test->getbuildmessage($messageInfo);
             if (false) {
-                $data = [
-                    'level' => $subject::getLevelName($level),
-                    'block' => $block
-                ];
-
-                $this->publisher->publish(
-                    'slack.notify.logger',
-                    json_encode($data)
-                );
+//                $data = [
+//                    'level' => $subject::getLevelName($level),
+//                    'block' => $block
+//                ];
+//
+//                $this->publisher->publish(
+//                    'slack.notify.logger',
+//                    json_encode($data)
+//                );
             } else {
                 $this->test->getmessage($subject::getLevelName($level), $block);
             }
