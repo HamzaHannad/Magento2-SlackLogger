@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 
 namespace Magify\SlackNotifier\Model;
+use Magento\Framework\App\State;
 
 //use Magify\SlackNotifier\Helper\Message as MessageHelper;
 
@@ -10,10 +11,11 @@ namespace Magify\SlackNotifier\Model;
 class Consumer
 {
     private $messageHelper;
+    protected $state;
 
-
-   public function __construct(/*MessageHelper $messageHelper*/)
+   public function __construct(/*MessageHelper $messageHelper*/ State $state,)
    {
+       $this->state = $state;
        //$this->messageHelper = $messageHelper;
    }
 
@@ -24,6 +26,8 @@ class Consumer
      */
     public function process($request)
     {
+        $this->state->setAreaCode('crontab');
+
         $data = json_decode($request, true);
        // $this->messageHelper->sendMessage($data['level'], $data['block']);
     }
