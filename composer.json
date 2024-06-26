@@ -1,8 +1,8 @@
 {
-  "name": "magify/module-slack-notifier",
+  "name": "magify/magento2-module-slacknotifier",
   "description": "This Magento 2 module automatically sends every logger exception to a specified Slack channel.",
   "require": {
-    "php": ">=7.4",
+    "php": "^7.4",
     "magento/framework": "103.0.*",
     "magento/module-customer": "103.0.*",
     "magento/module-store": "101.1.*"

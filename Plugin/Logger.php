@@ -3,34 +3,35 @@
 namespace Magify\SlackNotifier\Plugin;
 
 use Magento\Framework\DataObject;
+use Magify\SlackNotifier\Helper\Message as MessageHelper;
 use Monolog\Logger as MonologLogger;
-//use Magify\SlackNotifier\Helper\Config as ConfigHelper;
-use Magify\SlackNotifier\Service\Test;
-//use Magento\Framework\MessageQueue\PublisherInterface;
+use Magify\SlackNotifier\Helper\Config as ConfigHelper;
+use Magento\Framework\MessageQueue\PublisherInterface;
 
 class Logger
 {
     private $configHelper;
     private $publisher;
+    private $messageHelper;
     private $dataObject;
-    private $test;
 
     /**
      * @param ConfigHelper $configHelper
      * @param PublisherInterface $publisher
+     * @param MessageHelper $messageHelper
      * @param DataObject $dataObject
      */
     public function __construct(
-//        ConfigHelper $configHelper,
-//        PublisherInterface $publisher,
-        DataObject $dataObject,
-        Test $test
+        ConfigHelper $configHelper,
+        PublisherInterface $publisher,
+        MessageHelper $messageHelper,
+        DataObject $dataObject
     )
     {
-//        $this->configHelper = $configHelper;
-//        $this->publisher = $publisher;
+        $this->configHelper = $configHelper;
+        $this->publisher = $publisher;
+        $this->messageHelper = $messageHelper;
         $this->dataObject = $dataObject;
-        $this->test = $test;
     }
 
     public function beforeAddRecord(
@@ -45,8 +46,8 @@ class Logger
             return [$level, $message, $context];
         }
 
-//        if ($this->configHelper->isSlackNotifierEnabled() && in_array($level, $this->configHelper->getLoggerTypes()))
-//        {
+        if ($this->configHelper->isSlackNotifierEnabled() && in_array($level, $this->configHelper->getLoggerTypes()))
+        {
             $timezone = new \DateTimeZone(date_default_timezone_get() ?: 'UTC');
             $ts = new \DateTime('now', $timezone);
             $ts->setTimezone($timezone);
@@ -59,22 +60,22 @@ class Logger
                     'context' => $context
                 ]
             );
-            $block = $this->test->getbuildmessage($messageInfo);
-            if (false) {
-//                $data = [
-//                    'level' => $subject::getLevelName($level),
-//                    'block' => $block
-//                ];
-//
-//                $this->publisher->publish(
-//                    'slack.notify.logger',
-//                    json_encode($data)
-//                );
+            $block = $this->messageHelper->buildMessage($messageInfo);
+            if ($this->configHelper->isSendAsync()) {
+                $data = [
+                    'level' => $subject::getLevelName($level),
+                    'block' => $block
+                ];
+
+                $this->publisher->publish(
+                    'slack.notify.logger',
+                    json_encode($data)
+                );
             } else {
-                $this->test->getmessage($subject::getLevelName($level), $block);
+                $this->messageHelper->sendMessage($subject::getLevelName($level), $block);
             }
 
-//        }
+        }
         return [$level, $message, $context];
     }
 
