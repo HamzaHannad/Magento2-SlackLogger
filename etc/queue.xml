@@ -1,8 +1,0 @@
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/queue.xsd">
-    <broker topic="slack.notify.logger" exchange="magento-db" type="db">
-        <queue name="slack.notify.logger"
-               consumer="slack.notify.logger"
-               consumerInstance="Magento\Framework\MessageQueue\Consumer"
-               handler="Magify\SlackNotifier\Model\Consumer::process"/>
-    </broker>
-</config>
