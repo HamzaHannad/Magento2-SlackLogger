@@ -57,7 +57,11 @@ class Config extends AbstractHelper
      */
     public function getLoggerTypes(): array
     {
-        return explode(',', $this->getConfig(self::XML_PATH_LOGGER_TYPES));
+        if ($type = $this->getConfig(self::XML_PATH_LOGGER_TYPES)) {
+            return explode(',', $type);
+        }
+
+        return [];
     }
 
     /**

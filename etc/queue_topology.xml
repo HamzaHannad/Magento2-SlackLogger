@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/topology.xsd">
+    <exchange name="magify.slacknotifier.exchange" type="topic" connection="db">
+        <binding
+            id="magify.slacknotifier.slack.logger"
+            topic="magify.slacknotifier.slack.logger"
+            destinationType="queue"
+            destination="magify.slacknotifier.slack.logger"/>
+    </exchange>
+</config>
