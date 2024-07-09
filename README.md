@@ -9,6 +9,7 @@ The Magento 2 Slack Notifier module sends logger exceptions automatically to a s
 - Sends logger exceptions to a Slack channel
 - Configurable log levels (Alert, Debug, Critical, Info, Error, Emergency, Notice, Warning)
 - Option to use synchronous or asynchronous sending
+- Custom message service to send messages to specified channels with async/sync options (for developers)
 ## Installation
 
 ### Using Composer
@@ -43,6 +44,57 @@ The Magento 2 Slack Notifier module sends logger exceptions automatically to a s
 ## Usage
 
 Once configured, the module will automatically send log exceptions of the specified types to your Slack channel. You can monitor these notifications to quickly respond to issues in your Magento store.
+
+## Custom Message Service
+
+### Overview
+
+The custom message service allows developers to send any message to a specified Slack channel, with the option to choose between asynchronous or synchronous sending.
+
+### Note
+
+If the channel and token are not set in the function parameters, the service will use the values configured in the Magento admin panel.
+
+### Usage
+
+Here is an example of how to use the custom message service in your Magento 2 module:
+
+1. Inject the `SlackNotifierService` in your class:
+
+    ```php
+    <?php
+
+    namespace YourVendorName\SlackNotifier\Controller\Index;
+
+    use Magento\Framework\App\Action\Action;
+    use Magento\Framework\App\Action\Context;
+    use YourVendorName\SlackNotifier\Service\SlackNotifierService;
+
+    class Test extends Action
+    {
+        protected $slackNotifierService;
+
+        public function __construct(Context $context, SlackNotifierService $slackNotifierService)
+        {
+            $this->slackNotifierService = $slackNotifierService;
+            parent::__construct($context);
+        }
+
+        public function execute()
+        {
+            $title= "This is a test title";
+            $message = "This is a test message";
+            $channel = "your-channel-id";
+            $token = "your-token";
+            $async = false; // or true based on your requirement
+            
+            $this->slackNotifierService->sendCustomMessage($title, $message, $async, $channel, $token);
+        }
+    }
+    ```
+
+2. Call the `sendCustomMessage` method with your title, message, channel ID, token and sending type (async/sync).
+
 
 ## Support
 
