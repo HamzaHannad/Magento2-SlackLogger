@@ -6,6 +6,7 @@ use Magento\Framework\DataObject;
 use Magento\Framework\MessageQueue\PublisherInterface;
 use Magify\SlackNotifier\Helper\Message as MessageHelper;
 use Monolog\Logger as MonologLogger;
+use Magify\SlackNotifier\Model\LoggerExceptionConsumer;
 use Magify\SlackNotifier\Helper\Config as ConfigHelper;
 
 class Logger
@@ -66,12 +67,13 @@ class Logger
             if ($isAsync) {
                 $data = [
                     'level' => $subject::getLevelName($level),
-                    'block' => $block
+                    'block' => $block,
+                    'isException' => true
                 ];
 
-                $this->publisher->publish('magify.slacknotifier.slack.logger', json_encode($data));
+                $this->publisher->publish(LoggerExceptionConsumer::MAGIFY_SLACKNOTIFIER_SLACK_LOGGER, json_encode($data));
             } else {
-                $this->messageHelper->sendMessage($subject::getLevelName($level), $block);
+                $this->messageHelper->notifyException($subject::getLevelName($level), $block);
             }
         }
         return [$level, $message, $context];

@@ -46,13 +46,15 @@ class Message
     }
 
     /**
+     * send exception message to slack channel
+     *
      * @param $level
      * @param $block
      * @return void
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function sendMessage($level, $block): void
+    public function notifyException($level, $block): void
     {
         $channelId = $this->config->getChannelId();
         $token = $this->config->getToken();
@@ -97,6 +99,8 @@ class Message
     }
 
     /**
+     * build exception message
+     *
      * @param $messageInfo
      * @return false|string
      * @throws \Magento\Framework\Exception\LocalizedException
@@ -169,6 +173,8 @@ class Message
     }
 
     /**
+     * build block of exception message
+     *
      * @param $context
      * @return string
      */
@@ -198,6 +204,104 @@ class Message
                     "border" => 0
                 ]
             ]
+        ];
+    }
+
+    /**
+     * Send a custom message
+     *
+     * @param $title
+     * @param $message
+     * @param $isAsync
+     * @param $channel
+     * @param $token
+     * @return void
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function sendCustomMessage($title, $message, $isAsync = false, $channel = null, $token = null): void
+    {
+        $channelId = $channel ?? $this->config->getChannelId();
+        $token = $token ?? $this->config->getToken();
+        $uri = $this->config->getApiUri();
+
+        if ($uri && $channelId && $token) {
+
+            /** @var Client $client */
+            $client = $this->clientFactory->create([
+                'timeout' => $isAsync ? 0 : $this->config->getTimeout()
+            ]);
+
+            try {
+
+                $response = $client->post(
+                    $uri,
+                    ["headers" =>
+                        [
+                            "Authorization" => "Bearer " . $token
+                        ],
+                        "json" => [
+                            "text" => $title,
+                            "channel" => $channelId,
+                            "blocks" => $this->buildBlockCustomMessage($title, $message)
+                        ]
+                    ]
+                );
+
+                $responseContent = json_decode($response->getBody()->getContents(), true);
+
+                if ($response->getStatusCode() !== 200 || (is_array($responseContent) && isset($responseContent['error']))) {
+                    $this->logger->critical($responseContent['error'], ['details' => json_encode($responseContent), 'source' => 'slack_notify']);
+                }
+
+            } catch (Exception|ClientException $e) {
+                $this->logger->critical($e->getMessage(), ['source' => 'slack_notify']);
+            }
+        } else {
+            $this->logger->critical('One of the Slack credentials is incorrect. (Url or Channel ID or Token)', ['source' => 'slack_notify']);
+        }
+    }
+
+    /**
+     * build block for a custom message
+     *
+     * @param $title
+     * @param $message
+     * @return array
+     */
+    public function buildBlockCustomMessage($title, $message): array
+    {
+        return [
+            [
+                "type" => "divider"
+            ],
+            [
+                "type" => "context",
+                "elements" => [
+                    [
+                        "type" => "mrkdwn",
+                        "text" => "*Title*"
+                    ],
+                    [
+                        "type" => "plain_text",
+                        "text" => $title
+                    ]
+                ]
+            ],
+            [
+                "type" => "context",
+                "elements" => [
+                    [
+                        "type" => "mrkdwn",
+                        "text" => "*Message*"
+                    ],
+                    [
+                        "type" => "plain_text",
+                        "text" => $message
+                    ]
+                ]
+            ]
+
         ];
     }
 }
