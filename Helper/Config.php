@@ -6,6 +6,7 @@ use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\Encryption\EncryptorInterface;
 
 class Config extends AbstractHelper
 {
@@ -17,18 +18,22 @@ class Config extends AbstractHelper
     const XML_PATH_TIMEOUT = 'dev/slack_notifier/timeout';
     const XML_PATH_API_REQUEST_URI = 'dev/slack_notifier/url';
     private $storeManager;
+    private $encryptor;
 
     /**
      * @param Context $context
      * @param StoreManagerInterface $storeManager
+     * @param EncryptorInterface $encryptor
      */
     public function __construct(
         Context $context,
         StoreManagerInterface $storeManager,
+        EncryptorInterface $encryptor,
     )
     {
         parent::__construct($context);
         $this->storeManager = $storeManager;
+        $this->encryptor = $encryptor;
     }
 
     /**
@@ -79,7 +84,8 @@ class Config extends AbstractHelper
      */
     public function getToken(): string
     {
-        return $this->getConfig(self::XML_PATH_TOKEN);
+        $token =  $this->getConfig(self::XML_PATH_TOKEN);
+        return $this->encryptor->decrypt($token);
     }
 
     /**

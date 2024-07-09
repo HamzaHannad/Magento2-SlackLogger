@@ -56,6 +56,7 @@
                     <depends>
                         <field id="enable">1</field>
                     </depends>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                 </field>
             </group>
         </section>
