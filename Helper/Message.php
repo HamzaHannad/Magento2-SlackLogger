@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Magify\SlackNotifier\Helper;
 
@@ -6,9 +8,12 @@ use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientFactory;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\GuzzleException;
 use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\App\State;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Psr\Log\LoggerInterface;
 
 class Message
@@ -35,8 +40,7 @@ class Message
         CustomerSession $customerSession,
         State $state,
         Http $requestHttp
-    )
-    {
+    ) {
         $this->logger = $logger;
         $this->config = $config;
         $this->clientFactory = $clientFactory;
@@ -51,8 +55,8 @@ class Message
      * @param $level
      * @param $block
      * @return void
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws GuzzleException
+     * @throws NoSuchEntityException
      */
     public function notifyException($level, $block): void
     {
@@ -68,7 +72,6 @@ class Message
             ]);
 
             try {
-
                 $response = $client->post(
                     $uri,
                     ["headers" =>
@@ -85,25 +88,33 @@ class Message
 
                 $responseContent = json_decode($response->getBody()->getContents(), true);
 
-                if ($response->getStatusCode() !== 200 || (is_array($responseContent) && isset($responseContent['error']))) {
-                    $this->logger->critical($responseContent['error'], ['details' => json_encode($responseContent), 'source' => 'slack_notify']);
+                if (
+                    $response->getStatusCode() !== 200 || (is_array($responseContent)
+                    && isset($responseContent['error']))
+                ) {
+                    $this->logger->critical(
+                        $responseContent['error'],
+                        ['details' => json_encode($responseContent),
+                        'source' => 'slack_notify']
+                    );
                 }
-
-            } catch (Exception|ClientException $e) {
+            } catch (Exception | ClientException $e) {
                 $this->logger->critical($e->getMessage(), ['source' => 'slack_notify']);
             }
         } else {
-            $this->logger->critical('One of the Slack credentials is incorrect. (Url or Channel ID or Token)', ['source' => 'slack_notify']);
+            $this->logger->critical(
+                'One of the Slack credentials is incorrect. (Url or Channel ID or Token)',
+                ['source' => 'slack_notify']
+            );
         }
-
     }
 
     /**
      * build exception message
      *
      * @param $messageInfo
-     * @return false|string
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return string
+     * @throws LocalizedException
      */
     public function buildMessage($messageInfo): string
     {
@@ -112,7 +123,7 @@ class Message
         $userEmail = $isLogin ? $this->customerSession->getCustomer()->getEmail() : '-';
         $groupId = $isLogin ? $this->customerSession->getCustomer()->getGroupId() : '-';
         $clientIP = $this->requestHttp->getClientIp();
-        $level= $messageInfo['level'];
+        $level = $messageInfo['level'];
         $date = $messageInfo['date'];
         $message = $messageInfo['message'];
         $context = $messageInfo['context'];
@@ -175,10 +186,10 @@ class Message
     /**
      * build block of exception message
      *
-     * @param $context
-     * @return string
+     * @param array $context
+     * @return array
      */
-    private function buildBlockContext($context): array
+    private function buildBlockContext(array $context): array
     {
         $blockMessage = '';
 
@@ -210,17 +221,22 @@ class Message
     /**
      * Send a custom message
      *
-     * @param $title
-     * @param $message
-     * @param $isAsync
-     * @param $channel
-     * @param $token
+     * @param string $title
+     * @param string $message
+     * @param bool $isAsync
+     * @param string|null $channel
+     * @param string|null $token
      * @return void
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws GuzzleException
+     * @throws NoSuchEntityException
      */
-    public function sendCustomMessage($title, $message, $isAsync = false, $channel = null, $token = null): void
-    {
+    public function sendCustomMessage(
+        string $title,
+        string $message,
+        bool $isAsync = false,
+        string $channel = null,
+        string $token = null
+    ): void {
         $channelId = $channel ?? $this->config->getChannelId();
         $token = $token ?? $this->config->getToken();
         $uri = $this->config->getApiUri();
@@ -233,7 +249,6 @@ class Message
             ]);
 
             try {
-
                 $response = $client->post(
                     $uri,
                     ["headers" =>
@@ -250,26 +265,32 @@ class Message
 
                 $responseContent = json_decode($response->getBody()->getContents(), true);
 
-                if ($response->getStatusCode() !== 200 || (is_array($responseContent) && isset($responseContent['error']))) {
-                    $this->logger->critical($responseContent['error'], ['details' => json_encode($responseContent), 'source' => 'slack_notify']);
+                if (
+                    $response->getStatusCode() !== 200 || (is_array($responseContent)
+                    && isset($responseContent['error']))
+                ) {
+                    $this->logger->critical($responseContent['error'], ['details' => json_encode($responseContent),
+                        'source' => 'slack_notify']);
                 }
-
-            } catch (Exception|ClientException $e) {
+            } catch (Exception | ClientException $e) {
                 $this->logger->critical($e->getMessage(), ['source' => 'slack_notify']);
             }
         } else {
-            $this->logger->critical('One of the Slack credentials is incorrect. (Url or Channel ID or Token)', ['source' => 'slack_notify']);
+            $this->logger->critical(
+                'One of the Slack credentials is incorrect. (Url or Channel ID or Token)',
+                ['source' => 'slack_notify']
+            );
         }
     }
 
     /**
      * build block for a custom message
      *
-     * @param $title
-     * @param $message
+     * @param string $title
+     * @param string $message
      * @return array
      */
-    public function buildBlockCustomMessage($title, $message): array
+    public function buildBlockCustomMessage(string $title, string $message): array
     {
         return [
             [

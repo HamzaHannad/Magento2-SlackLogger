@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Magify\SlackNotifier\Model\Config\Source;
 
@@ -7,7 +9,6 @@ use Monolog\Logger;
 
 class LoggerType implements OptionSourceInterface
 {
-
     /**
      * @return array[]
      */

@@ -1,7 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Magify\SlackNotifier\Service;
 
+use GuzzleHttp\Exception\GuzzleException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\MessageQueue\PublisherInterface;
 use Magify\SlackNotifier\Helper\Message;
 use Magify\SlackNotifier\Model\LoggerExceptionConsumer;
@@ -11,7 +15,6 @@ use Magify\SlackNotifier\Model\LoggerExceptionConsumer;
  */
 class SlackNotifierService
 {
-
     private $message;
     private $publisher;
 
@@ -20,10 +23,9 @@ class SlackNotifierService
      * @param PublisherInterface $publisher
      */
     public function __construct(
-        Message  $message,
+        Message $message,
         PublisherInterface $publisher
-    )
-    {
+    ) {
         $this->message = $message;
         $this->publisher = $publisher;
     }
@@ -31,15 +33,22 @@ class SlackNotifierService
     /**
      * Send a custom message
      *
-     * @param $title
-     * @param $message
-     * @param $isAsync
-     * @param $channel
-     * @param $token
+     * @param string $title
+     * @param string $message
+     * @param bool $isAsync
+     * @param string|null $channel
+     * @param string|null $token
      * @return void
+     * @throws GuzzleException
+     * @throws NoSuchEntityException
      */
-    public function sendCustomMessage($title, $message, $isAsync = false, $channel = null, $token = null): void
-    {
+    public function sendCustomMessage(
+        string $title,
+        string $message,
+        bool $isAsync = false,
+        string $channel = null,
+        string $token = null
+    ): void {
         if ($isAsync) {
             $data = [
                 'isException' => false,
@@ -49,7 +58,10 @@ class SlackNotifierService
                 'token' => $token,
             ];
 
-            $this->publisher->publish(LoggerExceptionConsumer::MAGIFY_SLACKNOTIFIER_SLACK_LOGGER, json_encode($data));
+            $this->publisher->publish(
+                LoggerExceptionConsumer::MAGIFY_SLACKNOTIFIER_SLACK_LOGGER,
+                json_encode($data)
+            );
         } else {
             $this->message->sendCustomMessage($title, $message, $isAsync, $channel, $token);
         }

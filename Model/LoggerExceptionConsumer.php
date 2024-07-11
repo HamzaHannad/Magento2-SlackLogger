@@ -1,7 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Magify\SlackNotifier\Model;
 
+use GuzzleHttp\Exception\GuzzleException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magify\SlackNotifier\Helper\Message as MessageHelper;
 
 class LoggerExceptionConsumer
@@ -14,8 +18,7 @@ class LoggerExceptionConsumer
      */
     public function __construct(
         MessageHelper $messageHelper,
-    )
-    {
+    ) {
         $this->messageHelper = $messageHelper;
     }
 
@@ -24,6 +27,8 @@ class LoggerExceptionConsumer
      *
      * @param $message
      * @return void
+     * @throws GuzzleException
+     * @throws NoSuchEntityException
      */
     public function process($message): void
     {
@@ -32,13 +37,11 @@ class LoggerExceptionConsumer
         $isException = $data['isException'];
 
         if ($isException) {
-
             $level  = $data['level'];
             $block  = $data['block'];
 
             $this->messageHelper->notifyException($level, $block);
         } else {
-
             $title  = $data['title'];
             $message  = $data['message'];
             $channel  = $data['channel'];
@@ -47,5 +50,4 @@ class LoggerExceptionConsumer
             $this->messageHelper->sendCustomMessage($title, $message, true, $channel, $token);
         }
     }
-
 }

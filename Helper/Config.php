@@ -1,7 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Magify\SlackNotifier\Helper;
 
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
@@ -10,13 +13,13 @@ use Magento\Framework\Encryption\EncryptorInterface;
 
 class Config extends AbstractHelper
 {
-    const XML_PATH_SLACK_NOTIFIER_STATUS = 'dev/slack_notifier/enable';
-    const XML_PATH_LOGGER_TYPES = 'dev/slack_notifier/logger_type';
-    const XML_PATH_CHANNEL_ID = 'dev/slack_notifier/channel_id';
-    const XML_PATH_TOKEN = 'dev/slack_notifier/token';
-    const XML_PATH_IS_ASYNC = 'dev/slack_notifier/is_async';
-    const XML_PATH_TIMEOUT = 'dev/slack_notifier/timeout';
-    const XML_PATH_API_REQUEST_URI = 'dev/slack_notifier/url';
+    public const XML_PATH_SLACK_NOTIFIER_STATUS = 'dev/slack_notifier/enable';
+    public const XML_PATH_LOGGER_TYPES = 'dev/slack_notifier/logger_type';
+    public const XML_PATH_CHANNEL_ID = 'dev/slack_notifier/channel_id';
+    public const XML_PATH_TOKEN = 'dev/slack_notifier/token';
+    public const XML_PATH_IS_ASYNC = 'dev/slack_notifier/is_async';
+    public const XML_PATH_TIMEOUT = 'dev/slack_notifier/timeout';
+    public const XML_PATH_API_REQUEST_URI = 'dev/slack_notifier/url';
     private $storeManager;
     private $encryptor;
 
@@ -29,8 +32,7 @@ class Config extends AbstractHelper
         Context $context,
         StoreManagerInterface $storeManager,
         EncryptorInterface $encryptor,
-    )
-    {
+    ) {
         parent::__construct($context);
         $this->storeManager = $storeManager;
         $this->encryptor = $encryptor;
@@ -38,11 +40,11 @@ class Config extends AbstractHelper
 
     /**
      * @param $path
-     * @param $scopeType
+     * @param string $scopeType
      * @return mixed
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
-    public function getConfig($path, $scopeType = ScopeInterface::SCOPE_STORE)
+    public function getConfig($path, string $scopeType = ScopeInterface::SCOPE_STORE): mixed
     {
         $scopeCode = $this->storeManager->getStore()->getId();
         return $this->scopeConfig->getValue($path, $scopeType, $scopeCode);
@@ -50,7 +52,7 @@ class Config extends AbstractHelper
 
     /**
      * @return int
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function isSlackNotifierEnabled(): int
     {
@@ -59,6 +61,7 @@ class Config extends AbstractHelper
 
     /**
      * @return array
+     * @throws NoSuchEntityException
      */
     public function getLoggerTypes(): array
     {
@@ -71,7 +74,7 @@ class Config extends AbstractHelper
 
     /**
      * @return string
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getChannelId(): string
     {
@@ -80,7 +83,7 @@ class Config extends AbstractHelper
 
     /**
      * @return string
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getToken(): string
     {
@@ -90,7 +93,7 @@ class Config extends AbstractHelper
 
     /**
      * @return int
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function isSendAsync(): int
     {
@@ -99,7 +102,7 @@ class Config extends AbstractHelper
 
     /**
      * @return float
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getTimeout(): float
     {
@@ -108,7 +111,7 @@ class Config extends AbstractHelper
 
     /**
      * @return string
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getApiUri(): string
     {

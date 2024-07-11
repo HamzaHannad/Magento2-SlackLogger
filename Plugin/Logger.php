@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Magify\SlackNotifier\Plugin;
 
@@ -27,8 +29,7 @@ class Logger
         MessageHelper $messageHelper,
         DataObject $dataObject,
         PublisherInterface $publisher,
-    )
-    {
+    ) {
         $this->configHelper = $configHelper;
         $this->messageHelper = $messageHelper;
         $this->dataObject = $dataObject;
@@ -40,15 +41,13 @@ class Logger
         int $level,
         string $message,
         array $context = []
-    ): array
-    {
+    ): array {
 
         if (!empty($context) && isset($context['source']) && $context['source'] === 'slack_notify') {
             return [$level, $message, $context];
         }
 
-        if ($this->configHelper->isSlackNotifierEnabled() && in_array($level, $this->configHelper->getLoggerTypes()))
-        {
+        if ($this->configHelper->isSlackNotifierEnabled() && in_array($level, $this->configHelper->getLoggerTypes())) {
             $isAsync = $this->configHelper->isSendAsync();
             $timezone = new \DateTimeZone(date_default_timezone_get() ?: 'UTC');
             $ts = new \DateTime('now', $timezone);
@@ -71,12 +70,14 @@ class Logger
                     'isException' => true
                 ];
 
-                $this->publisher->publish(LoggerExceptionConsumer::MAGIFY_SLACKNOTIFIER_SLACK_LOGGER, json_encode($data));
+                $this->publisher->publish(
+                    LoggerExceptionConsumer::MAGIFY_SLACKNOTIFIER_SLACK_LOGGER,
+                    json_encode($data)
+                );
             } else {
                 $this->messageHelper->notifyException($subject::getLevelName($level), $block);
             }
         }
         return [$level, $message, $context];
     }
-
 }
