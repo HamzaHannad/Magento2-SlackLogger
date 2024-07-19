@@ -59,7 +59,7 @@ If the channel and token are not set in the function parameters, the service wil
 
 Here is an example of how to use the custom message service in your Magento 2 module:
 
-1. Inject the `SlackNotifierService` in your class:
+1. Inject the `CustomMessage` in your class:
 
     ```php
     <?php
@@ -68,15 +68,15 @@ Here is an example of how to use the custom message service in your Magento 2 mo
 
     use Magento\Framework\App\Action\Action;
     use Magento\Framework\App\Action\Context;
-    use YourVendorName\SlackNotifier\Service\SlackNotifierService;
+    use YourVendorName\SlackNotifier\Model\CustomMessage;
 
     class Test extends Action
     {
-        protected $slackNotifierService;
+        protected $customMessage;
 
-        public function __construct(Context $context, SlackNotifierService $slackNotifierService)
+        public function __construct(Context $context, CustomMessage $customMessage)
         {
-            $this->slackNotifierService = $slackNotifierService;
+            $this->customMessage = $customMessage;
             parent::__construct($context);
         }
 
@@ -84,16 +84,16 @@ Here is an example of how to use the custom message service in your Magento 2 mo
         {
             $title= "This is a test title";
             $message = "This is a test message";
+            $async = false; // or true based on your requirement
             $channel = "your-channel-id";
             $token = "your-token";
-            $async = false; // or true based on your requirement
             
-            $this->slackNotifierService->sendCustomMessage($title, $message, $async, $channel, $token);
+            $this->customMessage->notifyMessage($title, $message, $async, $channel, $token);
         }
     }
     ```
 
-2. Call the `sendCustomMessage` method with your title, message, channel ID, token and sending type (async/sync).
+2. Call the `notifyMessage` method with your title, message, channel ID, token and sending type (async/sync).
 
 
 ## Support

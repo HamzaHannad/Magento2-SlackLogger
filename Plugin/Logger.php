@@ -4,38 +4,51 @@ declare(strict_types=1);
 
 namespace Magify\SlackNotifier\Plugin;
 
-use Magento\Framework\DataObject;
+use GuzzleHttp\Exception\GuzzleException;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\MessageQueue\PublisherInterface;
 use Magify\SlackNotifier\Helper\Message as MessageHelper;
 use Monolog\Logger as MonologLogger;
-use Magify\SlackNotifier\Model\LoggerExceptionConsumer;
+use Magify\SlackNotifier\Model\ExceptionConsumer;
 use Magify\SlackNotifier\Helper\Config as ConfigHelper;
+use Magify\SlackNotifier\Model\ExceptionMessage;
 
 class Logger
 {
     private $configHelper;
     private $messageHelper;
-    private $dataObject;
     private $publisher;
+    private $exceptionMessage;
 
     /**
      * @param ConfigHelper $configHelper
      * @param MessageHelper $messageHelper
-     * @param DataObject $dataObject
      * @param PublisherInterface $publisher
+     * @param ExceptionMessage $exceptionMessage
      */
     public function __construct(
         ConfigHelper $configHelper,
         MessageHelper $messageHelper,
-        DataObject $dataObject,
         PublisherInterface $publisher,
+        ExceptionMessage $exceptionMessage,
     ) {
         $this->configHelper = $configHelper;
         $this->messageHelper = $messageHelper;
-        $this->dataObject = $dataObject;
         $this->publisher = $publisher;
+        $this->exceptionMessage = $exceptionMessage;
     }
 
+    /**
+     * @param MonologLogger $subject
+     * @param int $level
+     * @param string $message
+     * @param array $context
+     * @return array
+     * @throws GuzzleException
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
+     */
     public function beforeAddRecord(
         MonologLogger $subject,
         int $level,
@@ -53,29 +66,28 @@ class Logger
             $ts = new \DateTime('now', $timezone);
             $ts->setTimezone($timezone);
 
-            $messageInfo = $this->dataObject->setData(
-                [
-                    'level' => $subject::getLevelName($level),
-                    'message' => $message,
-                    'date' => $ts->format('d/M/Y h:i:s A'),
-                    'context' => $context
-                ]
+            $blocks = $this->exceptionMessage->buildBlockMessage(
+                $subject::getLevelName($level),
+                $message,
+                $ts->format('d/M/Y h:i:s A'),
+                $context
             );
-            $block = $this->messageHelper->buildMessage($messageInfo);
-
             if ($isAsync) {
                 $data = [
-                    'level' => $subject::getLevelName($level),
-                    'block' => $block,
-                    'isException' => true
+                    'title' => $subject::getLevelName($level),
+                    'blocks' => $blocks,
+                    'isAsync' => true
                 ];
 
                 $this->publisher->publish(
-                    LoggerExceptionConsumer::MAGIFY_SLACKNOTIFIER_SLACK_LOGGER,
+                    ExceptionConsumer::MAGIFY_SLACK_NOTIFIER_EXCEPTION_QUEUE,
                     json_encode($data)
                 );
             } else {
-                $this->messageHelper->notifyException($subject::getLevelName($level), $block);
+                $this->messageHelper->sendMessage(
+                    $subject::getLevelName($level),
+                    $blocks
+                );
             }
         }
         return [$level, $message, $context];

@@ -3,4 +3,12 @@
     <type name="Monolog\Logger">
         <plugin name="magify_slack_notifier_logger" type="Magify\SlackNotifier\Plugin\Logger" />
     </type>
+
+    <type name="Magento\Config\Model\Config\TypePool">
+        <arguments>
+            <argument name="sensitive" xsi:type="array">
+                <item name="dev/slack_notifier/token" xsi:type="string">1</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

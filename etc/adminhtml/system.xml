@@ -57,7 +57,7 @@
                         <field id="enable">1</field>
                     </depends>
                 </field>
-                <field id="token" translate="label comment" type="text" sortOrder="11"
+                <field id="token" translate="label comment" type="obscure" sortOrder="11"
                        showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Token</label>
                     <comment>Set Slack app token.</comment>
@@ -65,7 +65,7 @@
                     <depends>
                         <field id="enable">1</field>
                     </depends>
-                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <backend_model>Magify\SlackNotifier\Model\Config\Backend\Encrypted</backend_model>
                 </field>
             </group>
         </section>

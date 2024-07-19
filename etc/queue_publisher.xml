@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/publisher.xsd">
-    <publisher topic="magify.slacknotifier.slack.logger">
-        <connection name="db" exchange="magify.slacknotifier.exchange"/>
+    <publisher topic="magify.slack.notifier.exception">
+        <connection name="db" exchange="magify.slack.notifier.exchange"/>
+    </publisher>
+    <publisher topic="magify.slack.notifier.custom.message">
+        <connection name="db" exchange="magify.slack.notifier.exchange"/>
     </publisher>
 </config>
